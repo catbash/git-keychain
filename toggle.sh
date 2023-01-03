@@ -1,11 +1,11 @@
 #! /bin/bash
 
-route=/home/test/.gitconfig # set as route to your .gitconfig file
+route=$HOME/.gitconfig
 
 printf "
 Select account to use.
-  0: test
-  1: example
+  0: test (github.com)
+  1: example (github.com)
 >> "
 read account
 rm -drf $route
