@@ -81,7 +81,7 @@ proc {write config} {id} {
 	User git
 	IdentityFile $::HOME/.ssh/$account(sshkey)
 	IdentitiesOnly yes"
-	set filename [file nativename "$::HOME/.ssh/config"]
+	set filename [file nativename "$::HOME/.ssh/git-keychain.ssh.conf"]
 	set {config file} [open $filename w]
 	puts ${config file} $config
 	close ${config file}
@@ -98,7 +98,8 @@ proc {write gitconfig} {id} {
 	puts ${gitconfig file} $gitconfig
 	close ${gitconfig file}
 	{write config} $id
-	puts [exec git config {--list}]
+	puts "make sure the following line is in your $::HOME/.ssh/config file:"
+	puts "Include git-keychain.ssh.conf"
 }
 
 

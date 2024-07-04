@@ -21,4 +21,7 @@ Accounts may optionally include an ssh key filename if the name of your key file
 
 Accounts may also optionally include a note.
 
-The script will overwrite the `~/.ssh/config` and `~/.gitconfig` files upon selection.
+The script will overwrite the `~/.ssh/git-keychain.ssh.conf` and `~/.gitconfig` files upon selection. If there is no `git-keychain.ssh.conf` file, the script will create one. In order to use this config, make sure the following is included in your standard ssh config file:
+```
+Include git-keychain.ssh.conf
+```
