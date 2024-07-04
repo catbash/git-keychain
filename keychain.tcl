@@ -10,9 +10,7 @@ proc @comment {comment} {}
 	- check that the HOME variable is set;
 	  otherwise throw error
 	- other error handling
-	- cleanup
-	- how to run tcl on windows platforms?
-	- test script on windows?
+	- cleanup + documentation
 }
 
 # initialize empty list to store accounts by name
