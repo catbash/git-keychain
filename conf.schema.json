@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "conf.schema.json",
+  "title": "git-keychain configuration",
+  "description": "Account configuration for git-keychain",
+  "type": "object",
+  "required": ["accounts"],
+  "additionalProperties": false,
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "description": "List of Git accounts. Each alias must be unique across all entries.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/account"
+      }
+    }
+  },
+  "$defs": {
+    "account": {
+      "type": "object",
+      "description": "A single Git account configuration.",
+      "required": ["alias", "username", "email", "host"],
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string",
+          "description": "Unique identifier for this account. Used as the primary key across all accounts.",
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "examples": ["work-github", "personal-codeberg"]
+        },
+        "username": {
+          "type": "string",
+          "description": "Git username / display name written to ~/.gitconfig.",
+          "minLength": 1
+        },
+        "email": {
+          "type": "string",
+          "description": "Git commit email address written to ~/.gitconfig.",
+          "format": "email"
+        },
+        "host": {
+          "type": "string",
+          "description": "Full hostname of the Git hosting platform (e.g. github.com).",
+          "minLength": 1,
+          "examples": ["github.com", "codeberg.org", "gitlab.com"]
+        },
+        "sshkey": {
+          "type": "string",
+          "description": "Filename of the SSH private key in ~/.ssh/. Defaults to the username value if omitted.",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string",
+          "description": "Free-form descriptive note about this account.",
+          "default": ""
+        }
+      }
+    }
+  }
+}

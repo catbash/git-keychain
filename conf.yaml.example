@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=conf.schema.json
+
+# color_active: "#00ADEF"   # optional — hex color for active/highlighted UI elements
+# color_muted: "#666666"    # optional — hex color for muted/secondary UI elements
+
+accounts:
+  - alias: test-github
+    username: test
+    email: test@test.com
+    host: github.com
+    # sshkey: test        # optional — defaults to username
+    # note: ""            # optional — free-form description
+  - alias: example-codeberg
+    username: example
+    email: example@example.com
+    host: codeberg.org
