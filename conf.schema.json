@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "git-keychain config",
+  "type": "object",
+  "required": ["accounts"],
+  "additionalProperties": false,
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["alias", "username", "email", "host", "sshkey"],
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "type": "string",
+            "description": "alias for account"
+          },
+          "username": {
+            "type": "string",
+            "description": "git username"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "git email"
+          },
+          "host": {
+            "type": "string",
+            "description": "git host (e.g. github.com, gitlab.com, codeberg.org, etc)"
+          },
+          "sshkey": {
+            "type": "string",
+            "description": "key filename in ~/.ssh"
+          },
+          "note": {
+            "type": "string",
+            "description": "freeform note"
+          }
+        }
+      }
+    }
+  }
+}

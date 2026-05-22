@@ -1,27 +1,44 @@
-A cli written in tcl to manage git accounts across multiple platforms.
+A bash script to manage git accounts across multiple platforms.
 
 ```
-commands:
-help        display this help text
-list        list all available accounts
-set <index> list all available accounts and then set account by index
-            (you may optionally specify the account index to skip
-            listing all accounts)
+keychain.sh
+
+--file=/path/to/file       specify conf file to use
+--alias=<alias>            set by the specified alias
+--help                     show this help
 ```
 
-Accounts are configured in the `accounts.conf` file. This file must be placed in the same directory as the tcl script. Accounts are configured with a username, email, and host. 
+Run with no `--alias` to list all configured accounts.
 
-Note that the host for any account _must_ include the full hostname for the platform. For example:
+## Dependencies
+
+Requires `yq` on `$PATH`
+
+## Configuration
+
+Accounts are configured in a YAML file (default: `./conf.yaml`, override with `--file=`). Each account requires `alias`, `username`, `email`, `host`, and `sshkey`. `note` is optional.
+
+Note that the host for any account _must_ include the full TLD for the platform. For example:
 - `github.com` -> OK
 - `github` -> NO
 - `codeberg.org` -> OK
 - `codeberg` -> NO
 
-Accounts may optionally include an ssh key filename if the name of your key file does not match the username of your account. The script assumes all ssh keys are in the `~/.ssh/` directory.
+`sshkey` is the key filename in `~/.ssh/`.
 
-Accounts may also optionally include a note.
+See `conf.example.yaml` for an example config file.
 
-The script will overwrite the `~/.ssh/git-keychain.ssh.conf` and `~/.gitconfig` files upon selection. If there is no `git-keychain.ssh.conf` file, the script will create one. In order to use this config, make sure the following is included in your standard ssh config file:
+Schema is in `conf.schema.json` for editor validation.
+
+## On Selection
+
+When `--alias=<alias>` matches:
+
+- `~/.gitconfig` is overwritten with the account's `username` and `email`. Existing file is backed up to `~/.gitconfig.<timestamp>.bak`.
+- `~/.ssh/catbash/git-keychain.conf` is overwritten with a Host block for the account. Existing file is backed up to `~/.ssh/catbash/git-keychain.conf.<timestamp>.bak`. Directory is created if missing.
+
+Include this line in `~/.ssh/config` to make sure all keychain switches are immediately applied to ssh:
+
 ```
-Include git-keychain.ssh.conf
+Include catbash/git-keychain.conf
 ```

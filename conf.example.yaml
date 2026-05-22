@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=conf.schema.json
+
+accounts:
+  - alias: example
+    username: example
+    email: example@email.test
+    host: github.com
+    sshkey: example-key
+  - alias: test
+    username: test
+    email: test.user@email.test
+    host: gitlab.com
+    sshkey: test
+    note: |
+      This is
+      a multiline
+      note!
