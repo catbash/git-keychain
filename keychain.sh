@@ -6,15 +6,6 @@ KEYCHAIN_FILE="$KEYCHAIN_FOLDER/git-keychain.conf"
 
 dependencies=(
   yq
-  cp
-  cat
-  printf
-  echo
-  mkdir
-  date
-  grep
-  read
-  # command
 )
 
 missing=()
@@ -37,6 +28,7 @@ keychain.sh
 
 --file=/path/to/file       specify conf file to use
 --alias=<alias>            set by the specified alias
+--cleanup                  remove all backups except most recent
 --help                     show this help
 "
 
@@ -44,7 +36,7 @@ CONF_FILE="./conf.yaml"
 
 write_git_config() {
     if [[ -f "$GITCONFIG" ]]; then
-      cp "$GITCONFIG" "$GITCONFIG.$(date +%s).bak"
+      cp "$GITCONFIG" "$GITCONFIG.$(date +%Y%m%d.%H%M%S).bak"
     fi
     cat > "$GITCONFIG" <<EOF
 [user]
@@ -55,7 +47,7 @@ EOF
 
 write_keychain_conf() {
     if [[ -f "$KEYCHAIN_FILE" ]]; then
-      cp "$KEYCHAIN_FILE" "$KEYCHAIN_FILE.$(date +%s).bak"
+      cp "$KEYCHAIN_FILE" "$KEYCHAIN_FILE.$(date +%Y%m%d.%H%M%S).bak"
     fi
     cat > "$KEYCHAIN_FILE" <<EOF
 Host $1
@@ -76,6 +68,24 @@ print_accounts() {
 
 get_note() {
   alias="$1" yq '.accounts[] | select(.alias == strenv(alias)) | .note' "$CONF_FILE"
+}
+
+cleanup_backups() {
+    local target="$1"
+    local backups=()
+    local f
+    while IFS= read -r f; do
+        backups+=("$f")
+    done < <(find "$(dirname "$target")" -maxdepth 1 -name "$(basename "$target").*.bak" 2>/dev/null | sort)
+    local n=${#backups[@]}
+    if (( n <= 1 )); then
+        return
+    fi
+    local i
+    for (( i=0; i<n-1; i++ )); do
+        rm -f -- "${backups[i]}"
+        echo "removed ${backups[i]}"
+    done
 }
 
 load_account_by_alias() {
@@ -131,20 +141,37 @@ for arg in "$@"; do
             load_account_by_alias "${arg#--alias=}"
             write_git_config "$ACTIVE_USERNAME" "$ACTIVE_EMAIL"
             write_keychain_conf "$ACTIVE_HOST" "$ACTIVE_KEY"
+            echo "git keychain switched to $ACTIVE_USERNAME at $ACTIVE_HOST"
             if ! grep -qF "Include catbash/git-keychain.conf" "$HOME/.ssh/config" 2>/dev/null; then
                 echo "Make sure to add this line to your ~/.ssh/config file"
                 echo "Include catbash/git-keychain.conf"
             fi
             exit 0
             ;;
+        --cleanup)
+            cleanup_backups "$GITCONFIG"
+            cleanup_backups "$KEYCHAIN_FILE"
+            exit 0
+            ;;
         --help|-h)
             printf '%s\n' "$HELPTEXT"
             exit 0
             ;;
-        *)
+        --*)
             printf 'Unknown argument: %s\n' "$arg" >&2
             printf '%s\n' "$HELPTEXT" >&2
             exit 1
+            ;;
+        *)
+            load_account_by_alias "$arg"
+            write_git_config "$ACTIVE_USERNAME" "$ACTIVE_EMAIL"
+            write_keychain_conf "$ACTIVE_HOST" "$ACTIVE_KEY"
+            echo "git keychain switched to $ACTIVE_USERNAME at $ACTIVE_HOST"
+            if ! grep -qF "Include catbash/git-keychain.conf" "$HOME/.ssh/config" 2>/dev/null; then
+                echo "Make sure to add this line to your ~/.ssh/config file"
+                echo "Include catbash/git-keychain.conf"
+            fi
+            exit 0
             ;;
     esac
 done
